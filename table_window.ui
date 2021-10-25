@@ -14,20 +14,7 @@
    <string>Project Sweat</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="to_add">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>360</y>
-      <width>101</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Добавить товар</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="to_table">
+   <widget class="QPushButton" name="go_back2">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -37,20 +24,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Ваши товары</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="to_grafik">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>280</y>
-      <width>101</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>График</string>
+     <string>Назад</string>
     </property>
    </widget>
    <widget class="QTableWidget" name="tableWidget">
@@ -63,7 +37,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="delete1">
     <property name="geometry">
      <rect>
       <x>630</x>
