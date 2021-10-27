@@ -22,21 +22,29 @@ class AddProd(QMainWindow):
         con = sqlite3.connect('Prods.db')
         cur = con.cursor()
         res = cur.execute("""SELECT id FROM Names""").fetchall()
+        res = [int(i[0]) for i in res]
         print(res)
         if len(res) > 0:
             b = res[-1] + 1
             cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (res[-1] + 1, a))
+            con.commit()
         else:
             b = 1
             cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (1, a))
+            con.commit()
             print(a)
         res = cur.execute("""SELECT id FROM Date""").fetchall()
+        res = [int(i[0]) for i in res]
         if len(res) > 0:
             cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (res[-1] + 1, b, str(datetime.date.today())))
+            con.commit()
         else:
             cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (1, b, str(datetime.date.today())))
+            con.commit()
             print(str(datetime.date.today()))
         res = cur.execute("""SELECT id FROM Names""").fetchall()
+        res = [int(i[0]) for i in res]
+        con.commit()
         con.close()
         self.Parcing(a, res[-1], b)
         self.close()
@@ -65,14 +73,17 @@ class AddProd(QMainWindow):
                 con = sqlite3.connect('Prods.db')
                 cur = con.cursor()
                 res = cur.execute("""SELECT id FROM Product""").fetchall()
-                id_name = list(id_name)
+                res = [int(i[0]) for i in res]
+                id_name = [id_name]
                 print(id_name)
                 print(quotes)
                 if len(res) > 0:
                     cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""", (res[-1] + 1, int(id_name[0]), str(quotes[0].text)))
+                    con.commit()
                 else:
                     print(str(quotes[0].text))
                     cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""", (1, int(id_name[0]), str(quotes[0].text)))
+                    con.commit()
                 flag = True
                 for j in quotes1:
                     if j.text != '':
@@ -80,14 +91,18 @@ class AddProd(QMainWindow):
                             j = str(j.text)
                             j = j[:len(j) - 2:] + j[len(j) - 1]
                             res1 = cur.execute("""SELECT id FROM Prices""").fetchall()
+                            res1 = [int(i[0]) for i in res1]
                             if len(res1) > 0:
                                 cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                             (res1[-1] + 1, int(id_name[0]), j))
+                                con.commit()
                             else:
                                 cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                             (1, int(id_name[0]), j))
+                                con.commit()
                                 print(j)
                             flag = False
+                con.commit()
                 con.close()
         search(link)
         parc(id_name)
@@ -133,7 +148,8 @@ class MyWidget(QMainWindow):
 
         con = sqlite3.connect('Prods.db')
         cur = con.cursor()
-        names = cur.execute("""SELECT name FROM Names""").fetchall()
+        names = cur.execute("""SELECT prod FROM Product""").fetchall()
+        names = [str(i[0]) for i in names]
         print(names)
         self.change_prod.addItems(names)
         self.now_name = self.change_prod.activated[str]
