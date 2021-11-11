@@ -27,37 +27,40 @@ class AddProd(QMainWindow):
         con = sqlite3.connect('Prods.db')
         cur = con.cursor()
         res = cur.execute("""SELECT id FROM Names""").fetchall()
+        res1 = cur.execute("""SELECT name FROM Names""").fetchall()
+        res1 = [i[0] for i in res1]
         res = [int(i[0]) for i in res]
         print(res)
-        if len(res) > 0:
-            b = res[-1] + 1
-            cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (res[-1] + 1, a))
-            con.commit()
-        else:
-            b = 1
-            cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (1, a))
-            con.commit()
-            print(a)
-        res = cur.execute("""SELECT id FROM Date""").fetchall()
-        res = [int(i[0]) for i in res]
-        if len(res) > 0:
-            cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (res[-1] + 1, b, str(datetime.date.today())))
-            con.commit()
-        else:
-            cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (1, b, str(datetime.date.today())))
-            con.commit()
-            print(str(datetime.date.today()))
+        if a not in res1:
+            if len(res) > 0:
+                b = res[-1] + 1
+                cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (res[-1] + 1, a))
+                con.commit()
+            else:
+                b = 1
+                cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (1, a))
+                con.commit()
+                print(a)
+        # res = cur.execute("""SELECT id FROM Date""").fetchall()
+        # res = [int(i[0]) for i in res]
+        # if len(res) > 0:
+        #     cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (res[-1] + 1, b, str(datetime.date.today())))
+        #     con.commit()
+        # else:
+        #     cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (1, b, str(datetime.date.today())))
+        #     con.commit()
+        #     print(str(datetime.date.today()))
         res = cur.execute("""SELECT id FROM Names""").fetchall()
         res = [int(i[0]) for i in res]
         con.commit()
         con.close()
-        self.Parcing(a, res[-1], b)
+        self.Parcing(a, res[-1])
         self.close()
 
     def cls(self):
         self.close()
 
-    def Parcing(self, link, id_name, b):
+    def Parcing(self, link, id_name):
         def search(link):
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:45.0) Gecko/20100101 Firefox/45.0'}
@@ -83,15 +86,18 @@ class AddProd(QMainWindow):
                 print(id_name)
                 print(quotes)
                 if len(quotes) == 0:
-                    QMessageBox.question(self, 'Connection Error!', "We can't connect to the service right now. Try again in 30 minutes!",
+                    QMessageBox.question(self, 'Connection Error!',
+                                         "We can't connect to the service right now. Try again in 30 minutes!",
                                          QMessageBox.No, QMessageBox.Yes)
                 else:
                     if len(res) > 0:
-                        cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""", (res[-1] + 1, int(id_name[0]), str(quotes[0].text)))
+                        cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""",
+                                    (res[-1] + 1, int(id_name[0]), str(quotes[0].text)))
                         con.commit()
                     else:
                         print(str(quotes[0].text))
-                        cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""", (1, int(id_name[0]), str(quotes[0].text)))
+                        cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""",
+                                    (1, int(id_name[0]), str(quotes[0].text)))
                         con.commit()
                     flag = True
                     for j in quotes1:
@@ -113,6 +119,7 @@ class AddProd(QMainWindow):
                                 flag = False
                     con.commit()
                     con.close()
+
         search(link)
         parc(id_name)
 
@@ -139,7 +146,9 @@ class ShowTable(QMainWindow):
         self.tableWidget.setRowCount(0)
         count = 0
         for i in range(len(names)):
-            prices = cur.execute("""SELECT price FROM Prices WHERE name_id = (SELECT name_id FROM Product WHERE prod = ?)""", (names[i][0],)).fetchall()
+            prices = cur.execute(
+                """SELECT price FROM Prices WHERE name_id = (SELECT name_id FROM Product WHERE prod = ?)""",
+                (names[i][0],)).fetchall()
             print(prices)
             prices = min(prices)
             count += 1
@@ -188,7 +197,7 @@ class MyWidget(QMainWindow):
         self.reboot.clicked.connect(self.parc)
         self.titles = None
 
-        self.orig = Image.open('1.png')
+        self.orig = Image.open('2.png')
         self.temp = ImageQt(self.orig)
         self.pixmap = QPixmap.fromImage(self.temp)
         self.grafik.setPixmap(self.pixmap.scaled(self.grafik.size()))
@@ -211,9 +220,11 @@ class MyWidget(QMainWindow):
         self.show_table.show()
 
     def parc(self):
+        self.now_name = self.change_prod.currentText()
         con = sqlite3.connect('Prods.db')
         cur = con.cursor()
-        link = cur.execute("""SELECT name FROM Names WHERE id = (SELECT id FROM Product WHERE prod = ?)""", (self.now_name,)).fetchall()
+        link = cur.execute("""SELECT name FROM Names WHERE id = (SELECT id FROM Product WHERE prod = ?)""",
+                           (self.now_name,)).fetchall()
         print(link)
         id = cur.execute("""SELECT id FROM Product WHERE prod = ?""", (self.now_name,)).fetchall()
         print(id)
@@ -260,16 +271,19 @@ class MyWidget(QMainWindow):
                             flag = False
                 con.commit()
                 con.close()
+
         search(link[0][0])
         parc(id[0][0])
 
-        prices = cur.execute("""SELECT price FROM Prices WHERE name_id = (SELECT name_id FROM Product WHERE prod = ?)""",
-                         (self.now_name,)).fetchall()
+        prices = cur.execute(
+            """SELECT price FROM Prices WHERE name_id = (SELECT name_id FROM Product WHERE prod = ?)""",
+            (self.now_name,)).fetchall()
         print(prices)
         pr = [i[0] for i in prices]
+        pr = [i[:len(i) - 1:] for i in pr]
         print(pr)
         plt.title(self.now_name, fontsize=10, fontname='Times New Roman')
-        plt.plot(pr)
+        plt.plot([i for i in range(len(pr))], pr)
         plt.savefig('1.png')
         self.orig = Image.open('1.png')
         self.temp = ImageQt(self.orig)
