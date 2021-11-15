@@ -186,10 +186,7 @@ class MyWidget(QMainWindow):
         super().__init__()
         uic.loadUi("main_window.ui", self)
 
-        # прикрепляем новое окно добавления
         self.add_prod = AddProd(self)
-
-        # прикрепляем новое окно удаления
         self.show_table = ShowTable(self)
 
         self.to_add.clicked.connect(self.show_insert_form)
@@ -212,11 +209,9 @@ class MyWidget(QMainWindow):
         print(str(self.now_name))
 
     def show_insert_form(self):
-        # функция для открытия окна добавления элементов
         self.add_prod.show()
 
     def show_delete_form(self):
-        # функция для открытия окна удаления элементов
         self.show_table.show()
 
     def parc(self):
