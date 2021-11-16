@@ -41,15 +41,7 @@ class AddProd(QMainWindow):
                 cur.execute("""INSERT INTO Names (id, name) VALUES (?, ?)""", (1, a))
                 con.commit()
                 print(a)
-        # res = cur.execute("""SELECT id FROM Date""").fetchall()
-        # res = [int(i[0]) for i in res]
-        # if len(res) > 0:
-        #     cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (res[-1] + 1, b, str(datetime.date.today())))
-        #     con.commit()
-        # else:
-        #     cur.execute("""INSERT INTO Date (id, name_id, date) VALUES (?, ?, ?)""", (1, b, str(datetime.date.today())))
-        #     con.commit()
-        #     print(str(datetime.date.today()))
+
         res = cur.execute("""SELECT id FROM Names""").fetchall()
         res = [int(i[0]) for i in res]
         con.commit()
@@ -85,10 +77,14 @@ class AddProd(QMainWindow):
                 id_name = [id_name]
                 print(id_name)
                 print(quotes)
+                print(res)
+                print(quotes1)
+
                 if len(quotes) == 0:
                     QMessageBox.question(self, 'Connection Error!',
                                          "We can't connect to the service right now. Try again in 30 minutes!",
                                          QMessageBox.No, QMessageBox.Yes)
+
                 else:
                     if len(res) > 0:
                         cur.execute("""INSERT INTO Product (id, name_id, prod) VALUES (?, ?, ?)""",
@@ -100,6 +96,7 @@ class AddProd(QMainWindow):
                                     (1, int(id_name[0]), str(quotes[0].text)))
                         con.commit()
                     flag = True
+
                     for j in quotes1:
                         if j.text != '':
                             if j.text[len(j.text) - 1] == '₽' and flag:
@@ -107,16 +104,19 @@ class AddProd(QMainWindow):
                                 j = j[:len(j) - 2:] + j[len(j) - 1]
                                 res1 = cur.execute("""SELECT id FROM Prices""").fetchall()
                                 res1 = [int(i[0]) for i in res1]
+
                                 if len(res1) > 0:
                                     cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                                 (res1[-1] + 1, int(id_name[0]), j))
                                     con.commit()
+
                                 else:
                                     cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                                 (1, int(id_name[0]), j))
                                     con.commit()
                                     print(j)
                                 flag = False
+
                     con.commit()
                     con.close()
 
@@ -137,6 +137,7 @@ class ShowTable(QMainWindow):
         cur = con.cursor()
         names = cur.execute("""SELECT prod FROM Product""").fetchall()
         ids = cur.execute(("""SELECT id FROM Product""")).fetchall()
+
         print(ids)
         print(names)
         self.tableWidget.setColumnCount(3)
@@ -145,6 +146,7 @@ class ShowTable(QMainWindow):
         header.setSectionResizeMode(1, QHeaderView.Stretch)
         self.tableWidget.setRowCount(0)
         count = 0
+
         for i in range(len(names)):
             prices = cur.execute(
                 """SELECT price FROM Prices WHERE name_id = (SELECT name_id FROM Product WHERE prod = ?)""",
@@ -156,6 +158,7 @@ class ShowTable(QMainWindow):
             self.tableWidget.setItem(i, 0, QTableWidgetItem(str(ids[i][0])))
             self.tableWidget.setItem(i, 1, QTableWidgetItem(names[i][0]))
             self.tableWidget.setItem(i, 2, QTableWidgetItem(prices[0]))
+
         self.tableWidget.resizeColumnsToContents()
 
     def delete(self):
@@ -165,9 +168,11 @@ class ShowTable(QMainWindow):
         con = sqlite3.connect('Prods.db')
         cur = con.cursor()
         print(ids)
+
         valid = QMessageBox.question(
             self, 'Attention!', "Are you sure you want delete this element?",
             QMessageBox.Yes, QMessageBox.No)
+
         if valid == QMessageBox.Yes:
             for i in ids:
                 cur.execute("""DELETE FROM Product WHERE id = ?""", (i,))
@@ -247,6 +252,7 @@ class MyWidget(QMainWindow):
                 id_name = [id_name]
                 print(id_name)
                 flag = True
+
                 for j in quotes1:
                     if j.text != '':
                         if j.text[len(j.text) - 1] == '₽' and flag:
@@ -254,16 +260,19 @@ class MyWidget(QMainWindow):
                             j = j[:len(j) - 2:] + j[len(j) - 1]
                             res1 = cur.execute("""SELECT id FROM Prices""").fetchall()
                             res1 = [int(i[0]) for i in res1]
+
                             if len(res1) > 0:
                                 cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                             (res1[-1] + 1, int(id_name[0]), j))
                                 con.commit()
+
                             else:
                                 cur.execute("""INSERT INTO Prices (id, name_id, price) VALUES (?, ?, ?)""",
                                             (1, int(id_name[0]), j))
                                 con.commit()
                                 print(j)
                             flag = False
+
                 con.commit()
                 con.close()
 
